@@ -49,7 +49,7 @@ bool DES::setKey(const unsigned char* keyArray)
 	
 	
 	/* Set the encryption key */
-	if ((keyErrorCode = des_set_key_checked(&des_key, this->key)) != 0)
+	if ((keyErrorCode = DES_set_key_checked(&des_key, &this->key)) != 0)
 	{
 		fprintf(stderr, "\nkey error %d\n", keyErrorCode);
 		

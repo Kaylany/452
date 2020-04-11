@@ -1,5 +1,7 @@
 #include "AES.h"
 
+
+AES::AES(){}
 /**
  * Sets the key to use
  * @param key - the first byte of this represents whether
