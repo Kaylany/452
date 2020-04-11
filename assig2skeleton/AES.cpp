@@ -27,15 +27,15 @@ bool AES::setKey(const unsigned char* keyArray)
 	// and aes.cpp example provided with the assignment.
 
 		this->key = new AES_KEY();
-			unsigned char arrayCopy[16];
-			memcpy(arrayCopy, keyArray + 1, 16);
-			if (keyArray[0] == '0') {
-				return !AES_set_encrypt_key(arrayCopy, 128, key);
-				
-			}
-			else if(keyArray[0] == '1'){
-				return !AES_set_decrypt_key(arrayCopy, 128, key);
-			}
+
+		unsigned char arrayCopy[16];
+		memcpy(arrayCopy, keyArray + 1, 16);
+		if (keyArray[0] == '0') {
+			return !AES_set_encrypt_key(arrayCopy, 128, key);
+		}
+		else if(keyArray[0] == '1'){
+			return !AES_set_decrypt_key(arrayCopy, 128, key);
+		}
 
 	return false;
 
