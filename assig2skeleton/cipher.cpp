@@ -77,14 +77,14 @@ int main(int argc, char** argv)
 				if(cipherName == "AES"){
 					for(int i = 0; i < fileSize; i += 16)
 					{
-						memset(newBlock, 0, 16);
+						memset(newBlock, 0, 17);
 
 						for(int j = 0; j < 16; j++){
 							newBlock[j] = text[i + j];
 						}
 						
 
-						memset(txtBuffer, 0, 16);
+						memset(txtBuffer, 0, 17);
 
 						txtBuffer = cipher->encrypt(newBlock);
 
@@ -123,17 +123,15 @@ int main(int argc, char** argv)
 				if(cipherName == "AES"){
 					for(int i = 0; i < fileSize; i += 16)
 					{
-						memset(newBlock, 0, 16);
+						memset(newBlock, 0, 17);
 
 						for(int j = 0; j < 16; j++){
 							newBlock[j] = text[i + j];
 						}
 							
-						memset(txtBuffer, 0, 16);
+						memset(txtBuffer, 0, 17);
 
 						txtBuffer = cipher->decrypt(newBlock);
-
-						cout << txtBuffer << endl;
 
 						for(int j = 0; j < 16; j++){
 							oFile << txtBuffer[j];
