@@ -77,14 +77,14 @@ int main(int argc, char** argv)
 				if(cipherName == "AES"){
 					for(int i = 0; i < fileSize; i += 16)
 					{
-						memset(newBlock, 0, 17);
+						memset(newBlock, 0, 16);
 
 						for(int j = 0; j < 16; j++){
 							newBlock[j] = text[i + j];
 						}
-						
+						cout << i << endl;
 
-						memset(txtBuffer, 0, 17);
+						memset(txtBuffer, 0, 16);
 
 						txtBuffer = cipher->encrypt(newBlock);
 
@@ -123,13 +123,13 @@ int main(int argc, char** argv)
 				if(cipherName == "AES"){
 					for(int i = 0; i < fileSize; i += 16)
 					{
-						memset(newBlock, 0, 17);
+						memset(newBlock, 0, 16);
 
 						for(int j = 0; j < 16; j++){
 							newBlock[j] = text[i + j];
 						}
 							
-						memset(txtBuffer, 0, 17);
+						memset(txtBuffer, 0, 16);
 
 						txtBuffer = cipher->decrypt(newBlock);
 

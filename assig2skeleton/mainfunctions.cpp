@@ -66,13 +66,13 @@ void setCipher(CipherInterface* &cipher, cipherValue cipherChoice, string choice
             cout << choiceEncDec_<< endl;
             if(choiceEncDec_ == "ENC"){
 
-                temp = (unsigned char*)malloc(sizeof(unsigned char) * 17);
+                temp = (unsigned char*)malloc(sizeof(unsigned char) * 33);
 			    strcpy((char*)temp, "0");
 			    strcat((char*)temp, (char*)*cryptoKey);
                 *cryptoKey = temp;
             }
             else if(choiceEncDec_ == "DEC"){
-                temp = (unsigned char*)malloc(sizeof(unsigned char) * 17);
+                temp = (unsigned char*)malloc(sizeof(unsigned char) * 33);
 			    strcpy((char*)temp, "1");
 			    strcat((char*)temp, (char*)*cryptoKey);
                 *cryptoKey = temp;
