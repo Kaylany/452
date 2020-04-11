@@ -4,25 +4,17 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-	/**
-	 * TODO: Replace the code below	with your code which can SWITCH
-	 * between DES and AES and encrypt files. DO NOT FORGET TO PAD
-	 * THE LAST BLOCK IF NECESSARY.
-	 *
-	 * NOTE: due to the incomplete skeleton, the code may crash or
-	 * misbehave.
-	 */
-
-
 	/* Declaring all local variables. */
 	CipherInterface* cipher = NULL;
-	char* cipherName;
-	const unsigned char* cryptoKey;
+	char* cipherName_;
 	char* inputFileName;
 	char* outFileName;
-	const unsigned char* choiceEncDec;
-	const unsigned char* cipherText;
-	const unsigned char* plainText;
+	char* choiceEncDec_;
+	unsigned char* cryptoKey;
+	unsigned char* cipherText;
+	unsigned char* plainText;
+	ifstream inFile;
+  	ofstream oFile;
 	bool keyIsSet = false;
 
 
@@ -30,38 +22,143 @@ int main(int argc, char** argv)
 		/* Checks for invalid number of arguements */
 		if(validNumArgs(argc)){
 			/* Assigns values if valid number of arguments */
-			cipherName = argv[1];
+			cipherName_ = argv[1];
 			cryptoKey = (unsigned char*) argv[2];
-			choiceEncDec = (unsigned char*) argv[3];
+			choiceEncDec_ = argv[3];
 			inputFileName = argv[4];
 			outFileName =  argv[5];
 		}
 		else{
 			throw INVALID_FORMAT;
 		}
-
+		
+		printf("%s\n", cryptoKey);
 		/* Attempt to find and set proper cipher */
-		findCipher(cipher, cipherName);
+		findCipher(cipher, cipherName_, choiceEncDec_, &cryptoKey);
 
-		/* Sets cipher key*/
+		printf("%s\n", cryptoKey);
+
+
+		/* Convert to string for comparisons */
+		string Choice = choiceEncDec_;
+		toUpperString(Choice);
+		string cipherName = cipherName_;
+		toUpperString(cipherName);
+
+
+		/* Sets cipher key */
 		keyIsSet = cipher->setKey(cryptoKey);
 
 		if (keyIsSet) {
-			/* Perform encryption */
-			toUpperString(choiceEncDec);
-			if(choiceEncDec == "ENC"){
-				readFile(inputFileName, plainText);
-				cipherText = cipher->encrypt(plainText);
-				writeFile(outFileName, cipherText);
-				cout << "Encrypted Text is: " << cipherText << endl;
+			/*=============== Read in text file ============*/
+			inFile.open((char*)inputFileName);
+			oFile.open((char*)outFileName);
 
+			/* Check is file opened successfully */
+			if(!inFile.is_open())
+			{
+				printf("Error opening file: %s\n", inputFileName);
+				throw INVALID_INPUT_FILE;
 			}
-			else if(choiceEncDec == "DEC"){
-				/* Perform decryption */
-				readFile(inputFileName, cipherText);
-				plainText = cipher->decrypt(cipherText);
-				writeFile(outFileName, plainText);
-				cout << "Decrypted Text is: " << plainText << endl;
+
+			/* Check is file opened successfully */
+			if(!oFile.is_open())
+			{
+				printf("Error opening file: %s\n", outFileName);
+				throw INVALID_OUTPUT_FILE;
+			}
+
+			stringstream buffer;
+			buffer << inFile.rdbuf();
+  			string text(buffer.str());
+  			int fileSize = text.length() - 1;
+			unsigned char* newBlock = new unsigned char;
+  			unsigned char* txtBuffer = new unsigned char[17];
+
+
+			/* Perform encryption */
+			if(Choice == "ENC"){
+				if(cipherName == "AES"){
+					for(int i = 0; i < fileSize; i += 16)
+					{
+						memset(newBlock, 0, 17);
+
+						for(int j = 0; j < 16; j++)
+						newBlock[j] = text[i + j];
+
+						memset(txtBuffer, 0, 17);
+
+						txtBuffer = cipher->encrypt(newBlock);
+
+						for(int j = 0; j < 16; j++)
+						oFile << text[j];
+
+						oFile.flush();
+					}
+
+					printf("AES Encryption Was Successful!\n");
+				}
+				else if(cipherName == "DES"){
+					for(int i = 0; i < fileSize; i += 8)
+					{
+						for(int j = 0; j < 8; j++)
+							newBlock[j] = text[i + j];
+
+						txtBuffer = cipher->decrypt(newBlock);
+
+						for(int j = 0; j < 8; j++)
+							oFile << txtBuffer[j];
+					}
+
+      				printf("DES Encryption Successful!\n");
+				}
+				else{
+					throw INVALID_CIPHER_NAME;
+				}
+				
+				
+			}
+			/* Perform decryption */
+			else if(Choice == "DEC"){
+				if(cipherName == "AES"){
+					for(int i = 0; i < fileSize; i += 16)
+					{
+						memset(newBlock, 0, 17);
+
+						for(int j = 0; j < 16; j++){
+							newBlock[j] = text[i + j];
+						}
+							
+						memset(txtBuffer, 0, 17);
+
+						txtBuffer = cipher->decrypt(newBlock);
+
+						for(int j = 0; j < 16; j++){
+							oFile << txtBuffer[j];
+						}
+									
+						oFile.flush();
+					}
+
+					printf("AES Decryption Was Successful!\n");
+				}
+				else if (cipherName == "DES"){
+					for(int i = 0; i < fileSize; i += 8)
+					{
+						for(int j = 0; j < 8; j++)
+							newBlock[j] = text[i + j];
+
+						txtBuffer = cipher->encrypt(newBlock);
+
+						for(int j = 0; j < 8; j++)
+							oFile << txtBuffer[j];
+					}
+
+					printf("DES Decryption Was Successful!\n");
+				}
+				else{
+					throw INVALID_CIPHER_NAME;
+				}
 			}
 			else{
 				throw INVALID_CRYPT;

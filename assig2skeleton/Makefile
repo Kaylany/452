@@ -1,8 +1,7 @@
 all:	cipher
 
-cipher:	cipher.o DES.o AES.o
-	g++ cipher.o DES.o AES.o -o cipher -lcrypto
-
+cipher:	cipher.o DES.o AES.o mainfunctions.o errorhandling.o
+	g++ cipher.o DES.o AES.o mainfunctions.o errorhandling.o -o cipher -lcrypto
 
 cipher.o:	cipher.cpp
 	g++ -g -c cipher.cpp
@@ -13,8 +12,11 @@ DES.o:	DES.cpp DES.h
 AES.o:	AES.cpp AES.h
 	g++ -g -c AES.cpp
 
-RSA.o: RSA.cpp RSA.h
-	g++ -g -c RSA.cpp
+mainfunctions.o:	mainfunctions.cpp mainfunctions.h
+	g++  -g -c mainfunctions.cpp
+
+errorhandling.o:	errorhandling.cpp errorhandling.h
+	g++  -g -c errorhandling.cpp
 
 clean:
 	rm -rf *.o cipher

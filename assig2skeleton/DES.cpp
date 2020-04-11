@@ -71,7 +71,7 @@ unsigned char* DES::encrypt(const unsigned char* plaintext)
 	//1. Declare an array DES_LONG block[2];
 	DES_LONG block[2];
 
-	unsigned char plaintText;
+	unsigned char plainText[8];
 	unsigned char cipherText[8];
 	for(int i = 0; i < 8; i++){
 		plainText[i] = plaintext[i];

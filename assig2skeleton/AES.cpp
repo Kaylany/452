@@ -1,7 +1,5 @@
 #include "AES.h"
 
-
-AES::AES(){}
 /**
  * Sets the key to use
  * @param key - the first byte of this represents whether
@@ -29,16 +27,14 @@ bool AES::setKey(const unsigned char* keyArray)
 	// and aes.cpp example provided with the assignment.
 
 		this->key = new AES_KEY();
-			int aes_key = 0;
 			unsigned char arrayCopy[16];
 			memcpy(arrayCopy, keyArray + 1, 16);
-			if (arrayCopy[0] == 0) {
-				aes_key = AES_set_encrypt_key(arrayCopy, 128, key);
-				return true;
+			if (keyArray[0] == '0') {
+				return !AES_set_encrypt_key(arrayCopy, 128, key);
+				
 			}
-			else {
-				aes_key = AES_set_decrypt_key(arrayCopy, 128, key);
-				return true;
+			else if(keyArray[0] == '1'){
+				return !AES_set_decrypt_key(arrayCopy, 128, key);
 			}
 
 	return false;
