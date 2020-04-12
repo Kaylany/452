@@ -68,8 +68,9 @@ int main(int argc, char** argv)
 			buffer << inFile.rdbuf();
   			string text(buffer.str());
   			int fileSize = text.length() - 1;
-			unsigned char* newBlock = new unsigned char;
-  			unsigned char* txtBuffer = new unsigned char[17];
+			unsigned char newBlock[17];
+  			unsigned char* txtBufferAES = new unsigned char[17];
+			unsigned char* txtBufferDES = new unsigned char[8];
 
 
 			/* Perform encryption */
@@ -77,23 +78,23 @@ int main(int argc, char** argv)
 				if(cipherName == "AES"){
 					for(int i = 0; i < fileSize; i += 16)
 					{
-						memset(newBlock, 0, 16);
+				
+						memset(newBlock, 0, 17);
 
 						for(int j = 0; j < 16; j++){
-							newBlock[j] = text[i + j];
+							newBlock[j] = (unsigned char)buffer.str()[i + j];
 						}
-						cout << i << endl;
+						
+						memset(txtBufferAES, 0, 17);
 
-						memset(txtBuffer, 0, 16);
-
-						txtBuffer = cipher->encrypt(newBlock);
+						txtBufferAES = cipher->encrypt(newBlock);
 
 						for(int j = 0; j < 16; j++){
-							oFile << txtBuffer[i];
+							oFile << txtBufferAES[i+j];
 						}
 						
 
-						oFile.flush();
+						//oFile.flush();
 					}
 
 					printf("AES Encryption Was Successful!\n");
@@ -104,11 +105,12 @@ int main(int argc, char** argv)
 						for(int j = 0; j < 8; j++)
 							newBlock[j] = text[i + j];
 
-						txtBuffer = cipher->decrypt(newBlock);
+						txtBufferDES = cipher->decrypt(newBlock);
 
 						for(int j = 0; j < 8; j++)
-							oFile << txtBuffer[j];
+							oFile << txtBufferDES[j];
 					}
+					//oFile.flush();
 
       				printf("DES Encryption Successful!\n");
 				}
@@ -121,23 +123,23 @@ int main(int argc, char** argv)
 			/* Perform decryption */
 			else if(Choice == "DEC"){
 				if(cipherName == "AES"){
-					for(int i = 0; i < fileSize; i += 16)
+					for(int i = 0; i < fileSize; i + 16)
 					{
-						memset(newBlock, 0, 16);
+						memset(newBlock, 0, 17);
 
 						for(int j = 0; j < 16; j++){
-							newBlock[j] = text[i + j];
+							newBlock[j] = (unsigned char)text[i + j];;
 						}
 							
-						memset(txtBuffer, 0, 16);
+						memset(txtBufferAES, 0, 17);
 
-						txtBuffer = cipher->decrypt(newBlock);
+						txtBufferAES = cipher->decrypt(newBlock);
 
 						for(int j = 0; j < 16; j++){
-							oFile << txtBuffer[j];
+							oFile << txtBufferAES[i + j];
 						}
 									
-						oFile.flush();
+						//oFile.flush();
 					}
 
 					printf("AES Decryption Was Successful!\n");
@@ -149,12 +151,12 @@ int main(int argc, char** argv)
 							newBlock[j] = text[i + j];
 						}
 							
-						txtBuffer = cipher->encrypt(newBlock);
+						txtBufferDES = cipher->encrypt(newBlock);
 
 						for(int j = 0; j < 8; j++){
-							oFile << txtBuffer[j];
+							oFile << txtBufferDES[j];
 						}
-							
+						//oFile.flush();
 					}
 
 					printf("DES Decryption Was Successful!\n");

@@ -60,20 +60,21 @@ cipherValue stringToValue(string cipherName_){
 void setCipher(CipherInterface* &cipher, cipherValue cipherChoice, string choiceEncDec_, unsigned char** cryptoKey){
 	/* Assigns the peoper cipher instance. */
     unsigned char* temp;
+	char one[1] = {'1'};
+	char zero[1] = {'0'};
 	switch (cipherChoice) {
 		case AES_:
 			cipher = new AES();
             cout << choiceEncDec_<< endl;
             if(choiceEncDec_ == "ENC"){
-
-                temp = (unsigned char*)malloc(sizeof(unsigned char) * 33);
-			    strcpy((char*)temp, "0");
+                temp = (unsigned char*)malloc(sizeof(**cryptoKey) * 34);
+			    memcpy((char*)temp, one, 1);
 			    strcat((char*)temp, (char*)*cryptoKey);
                 *cryptoKey = temp;
             }
             else if(choiceEncDec_ == "DEC"){
-                temp = (unsigned char*)malloc(sizeof(unsigned char) * 33);
-			    strcpy((char*)temp, "1");
+                temp = (unsigned char*)malloc(sizeof(**cryptoKey) * 34);
+			    memcpy((char*)temp, zero, 1);
 			    strcat((char*)temp, (char*)*cryptoKey);
                 *cryptoKey = temp;
             }
