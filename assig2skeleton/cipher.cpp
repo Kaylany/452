@@ -6,15 +6,11 @@ int main(int argc, char** argv)
 {
 	/* Declaring all local variables. */
 	CipherInterface* cipher = NULL;
-	char* cipherName_;
-	char* inputFileName;
-	char* outFileName;
-	char* choiceEncDec_;
+	string cipherName_;
+	string inputFileName;
+	string outFileName;
+	string choiceEncDec_;
 	unsigned char* cryptoKey;
-	unsigned char* cipherText;
-	unsigned char* plainText;
-	ifstream inFile;
-  	ofstream oFile;
 	bool keyIsSet = false;
 
 
@@ -31,9 +27,11 @@ int main(int argc, char** argv)
 		else{
 			throw INVALID_FORMAT;
 		}
-		
+
+		FILE * inFile = fopen(inputFileName.c_str(), "rb");
+  		FILE * oFile = fopen(outFileName.c_str(), "wb");;
 		/* Attempt to find and set proper cipher */
-		findCipher(cipher, cipherName_, choiceEncDec_, &cryptoKey);
+		findCipher(cipher, cipherName_.c_str(), choiceEncDec_.c_str(), &cryptoKey);
 
 		/* Convert to string for comparisons */
 		string Choice = choiceEncDec_;
@@ -46,117 +44,86 @@ int main(int argc, char** argv)
 		keyIsSet = cipher->setKey(cryptoKey);
 
 		if (keyIsSet) {
-			/*=============== Read in text file ============*/
-			inFile.open((char*)inputFileName);
-			oFile.open((char*)outFileName);
-
 			/* Check is file opened successfully */
-			if(!inFile.is_open())
+			if(!inFile)
 			{
-				printf("Error opening file: %s\n", inputFileName);
+				perror("Error opening input file\n");
 				throw INVALID_INPUT_FILE;
 			}
 
 			/* Check is file opened successfully */
-			if(!oFile.is_open())
+			if(!oFile)
 			{
-				printf("Error opening file: %s\n", outFileName);
+				perror("Error opening output file\n");
 				throw INVALID_OUTPUT_FILE;
 			}
-
-			stringstream buffer;
-			buffer << inFile.rdbuf();
-  			string text(buffer.str());
-  			int fileSize = text.length() - 1;
-			unsigned char newBlock[17];
-  			unsigned char* txtBufferAES = new unsigned char[17];
-			unsigned char* txtBufferDES = new unsigned char[8];
-
+			
+			unsigned char newBlock[16];
+  			unsigned char *txtBufferAES;
+			unsigned char *txtBufferDES;
 
 			/* Perform encryption */
 			if(Choice == "ENC"){
 				if(cipherName == "AES"){
-					for(int i = 0; i < fileSize; i += 16)
-					{
-				
-						memset(newBlock, 0, 17);
+					while(!feof(inFile)){
 
-						for(int j = 0; j < 16; j++){
-							newBlock[j] = (unsigned char)buffer.str()[i + j];
+						// Read the block size
+						int readByte = fread(newBlock, 1, 16, inFile);
+
+						// Pad the data if it is less then 16 bytes
+						if(readByte != 0 ){
+							for(int i = readByte; i < 16; i++){
+								newBlock[i] = '0';
+							}
+							txtBufferAES = cipher->encrypt((const unsigned char*) newBlock);
+							fwrite(txtBufferAES, 1, 16, oFile);
 						}
-						
-						memset(txtBufferAES, 0, 17);
-
-						txtBufferAES = cipher->encrypt(newBlock);
-
-						for(int j = 0; j < 16; j++){
-							oFile << txtBufferAES[i+j];
-						}
-						
-
-						//oFile.flush();
 					}
 
 					printf("AES Encryption Was Successful!\n");
 				}
 				else if(cipherName == "DES"){
-					for(int i = 0; i < fileSize; i += 8)
-					{
-						for(int j = 0; j < 8; j++)
-							newBlock[j] = text[i + j];
+					while(!feof(inFile)){
+						// Read the block size
+						int readByte = fread(newBlock, 1, 8, inFile);
 
-						txtBufferDES = cipher->decrypt(newBlock);
-
-						for(int j = 0; j < 8; j++)
-							oFile << txtBufferDES[j];
+						// Pad the data if it is less then 8 bytes
+						if(readByte != 0 ){
+							for(int i = readByte; i < 8; i++){
+								newBlock[i] = '0';
+							}
+							txtBufferAES = cipher->encrypt((const unsigned char*) newBlock);
+							fwrite(txtBufferAES, 1, 8, oFile);
+						}
 					}
-					//oFile.flush();
 
       				printf("DES Encryption Successful!\n");
 				}
 				else{
 					throw INVALID_CIPHER_NAME;
 				}
-				
-				
 			}
 			/* Perform decryption */
 			else if(Choice == "DEC"){
 				if(cipherName == "AES"){
-					for(int i = 0; i < fileSize; i + 16)
-					{
-						memset(newBlock, 0, 17);
+					while(!feof(inFile)){
+						// Read the block size
+						fread(newBlock, 1, 16, inFile);
 
-						for(int j = 0; j < 16; j++){
-							newBlock[j] = (unsigned char)text[i + j];;
-						}
-							
-						memset(txtBufferAES, 0, 17);
+						txtBufferAES = cipher->decrypt((const unsigned char*) newBlock);
 
-						txtBufferAES = cipher->decrypt(newBlock);
-
-						for(int j = 0; j < 16; j++){
-							oFile << txtBufferAES[i + j];
-						}
-									
-						//oFile.flush();
+						fwrite(txtBufferAES, 1, 16, oFile);
 					}
-
 					printf("AES Decryption Was Successful!\n");
 				}
 				else if (cipherName == "DES"){
-					for(int i = 0; i < fileSize; i += 8)
-					{
-						for(int j = 0; j < 8; j++){
-							newBlock[j] = text[i + j];
-						}
-							
-						txtBufferDES = cipher->encrypt(newBlock);
+					while(!feof(inFile)){
+						// Read the block size
+						fread(newBlock, 1, 8, inFile);
 
-						for(int j = 0; j < 8; j++){
-							oFile << txtBufferDES[j];
-						}
-						//oFile.flush();
+						txtBufferDES = cipher->decrypt((const unsigned char*) newBlock);
+
+						fwrite(txtBufferDES, 1, 8, oFile);
 					}
 
 					printf("DES Decryption Was Successful!\n");

@@ -30,7 +30,7 @@ const unordered_map<string, cipherValue> cipherNames = { make_pair("AES", AES_),
 /* Function prototypes */
 void setChoice(char * choice);
 bool validNumArgs(int argc);
-void findCipher(CipherInterface* &cipher, char* cipherName_, char* choiceEncDec_, unsigned char** cryptoKey);
+void findCipher(CipherInterface* &cipher,const char* cipherName_,const char* choiceEncDec_, unsigned char** cryptoKey);
 void setCipher(CipherInterface* &cipher, cipherValue cipherChoice, string choiceEncDec_, unsigned char** cryptoKey);
 void readFile(char* filename, string &text);
 void writeFile(char* fileName, string &text);

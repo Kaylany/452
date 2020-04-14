@@ -3,6 +3,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <iostream>
 #include <openssl/aes.h>
 #include <string.h>
 #include <string>
@@ -50,7 +51,7 @@ class AES: public CipherInterface
 	protected:
 
 		//TODO: declare the AES key
-		AES_KEY *enc_key, *dec_key;
+		AES_KEY enc_key, dec_key;
 };
 
 

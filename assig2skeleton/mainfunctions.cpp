@@ -27,7 +27,6 @@ bool validNumArgs(int argc){
 //======================================================================//
 
 cipherValue stringToValue(string cipherName_){
-
 	cipherValue cipherChoice = UNKNOWN;
     string cipherName = cipherName_;
 	
@@ -49,6 +48,22 @@ cipherValue stringToValue(string cipherName_){
 }
 
 //=======================================================================//
+//    Description: This function will find and set the proper
+//				   cipher class.
+//
+//    Input: cipher - cipher refrence that will be assigned
+//			 cipherChoice - cipher value that determines what
+// 							class to choose.
+//    Output: none
+//======================================================================//
+
+void findCipher(CipherInterface* &cipher, const char* cipherName_,const char* choiceEncDec_, unsigned char** cryptoKey) {
+    string cipherName = cipherName_;
+    string choiceEncDec = choiceEncDec_;
+	setCipher(cipher, stringToValue(cipherName), choiceEncDec,  cryptoKey);
+}
+
+//=======================================================================//
 //    Description: This function will set the proper cipher instance.
 //
 //    Input: cipher - cipher refrence that will be assigned
@@ -59,24 +74,20 @@ cipherValue stringToValue(string cipherName_){
 
 void setCipher(CipherInterface* &cipher, cipherValue cipherChoice, string choiceEncDec_, unsigned char** cryptoKey){
 	/* Assigns the peoper cipher instance. */
-    unsigned char* temp;
-	char one[1] = {'1'};
-	char zero[1] = {'0'};
+    unsigned char *temp = (unsigned char *)malloc((unsigned int)34*sizeof(unsigned char));
+	memset(temp, 0 ,34);
 	switch (cipherChoice) {
 		case AES_:
 			cipher = new AES();
-            cout << choiceEncDec_<< endl;
             if(choiceEncDec_ == "ENC"){
-                temp = (unsigned char*)malloc(sizeof(**cryptoKey) * 34);
-			    memcpy((char*)temp, one, 1);
-			    strcat((char*)temp, (char*)*cryptoKey);
-                *cryptoKey = temp;
+			    temp[0] = '0';
+			    strcpy((char*)temp+1, (char*)*cryptoKey);
+				*cryptoKey= temp;
             }
             else if(choiceEncDec_ == "DEC"){
-                temp = (unsigned char*)malloc(sizeof(**cryptoKey) * 34);
-			    memcpy((char*)temp, zero, 1);
-			    strcat((char*)temp, (char*)*cryptoKey);
-                *cryptoKey = temp;
+			    temp[0] = '1';
+			    strcpy((char*)temp+1, (char*)*cryptoKey);
+				*cryptoKey= temp;
             }
 			break;
 		case DES_: 
@@ -92,23 +103,6 @@ void setCipher(CipherInterface* &cipher, cipherValue cipherChoice, string choice
 			__FILE__, __FUNCTION__, __LINE__);
 		exit(-1);
 	}
-}
-
-//=======================================================================//
-//    Description: This function will find and set the proper
-//				   cipher class.
-//
-//    Input: cipher - cipher refrence that will be assigned
-//			 cipherChoice - cipher value that determines what
-// 							class to choose.
-//    Output: none
-//======================================================================//
-
-void findCipher(CipherInterface* &cipher, char* cipherName_, char* choiceEncDec_, unsigned char** cryptoKey) {
-    string cipherName = cipherName_;
-    string choiceEncDec = choiceEncDec_;
-	setCipher(cipher, stringToValue(cipherName), choiceEncDec,  cryptoKey) ;
-
 }
 
 //=======================================================================//

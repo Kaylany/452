@@ -27,17 +27,23 @@ bool AES::setKey(const unsigned char* keyArray)
 	// and aes.cpp example provided with the assignment.
 
 		
+		
+		unsigned char key[16];
+		string arrayString = (char*)keyArray;
+		
+		// Convert 2 chars to a single hex value
+		for(int i = 1; i < arrayString.size(); i+=2){
+			key[(i-1)/2] = stoi(arrayString.substr(i, 2), 0, 16);
+		}
 
-		unsigned char arrayCopy[32];
-		strncpy((char*)arrayCopy, (char*)(keyArray+1) , 32);
 		if (keyArray[0] == '0') {
-			enc_key = new AES_KEY();
-			return !AES_set_encrypt_key((const unsigned char*)arrayCopy, 128, enc_key);
+			return !AES_set_encrypt_key((const unsigned char*)key, 128, &enc_key);
 		}
 		else if(keyArray[0] == '1'){
-			dec_key = new AES_KEY();
-			return !AES_set_decrypt_key((const unsigned char*)arrayCopy, 128, dec_key);
+			return !AES_set_decrypt_key((const unsigned char*)key, 128, &dec_key);
 		}
+
+		
 
 	return false;
 
@@ -55,10 +61,10 @@ unsigned char* AES::encrypt(const unsigned char* plainText)
 	//	2. Use AES_ecb_encrypt(...) to encrypt the text (please see the URL in setKey(...)
 	//	and the aes.cpp example provided.
 	// 	3. Return the pointer to the ciphertext
-	unsigned char* cipherText = NULL;
-	cipherText = new unsigned char[16];
+	unsigned char* cipherText = new unsigned char[17];
+	memset(cipherText, 0, 17);
 
-	AES_ecb_encrypt(plainText, cipherText, enc_key, AES_ENCRYPT);
+	AES_ecb_encrypt(plainText, cipherText, &enc_key, AES_ENCRYPT);
 
 	return cipherText;
 }
@@ -75,10 +81,10 @@ unsigned char* AES::decrypt(const unsigned char* cipherText)
 	//	2. Use AES_ecb_encrypt(...) to decrypt the text (please see the URL in setKey(...)
 	//	and the aes.cpp example provided.
 	// 	3. Return the pointer to the plaintext
-	unsigned char* plainText = NULL;
-	plainText = new unsigned char[16];
+	unsigned char* plainText = new unsigned char[17];
+	memset(plainText, 0, 17);
 
-	AES_ecb_encrypt(cipherText, plainText, dec_key, AES_DECRYPT);
+	AES_ecb_encrypt(cipherText, plainText, &dec_key, AES_DECRYPT);
 
 	return plainText;
 }
